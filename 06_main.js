@@ -15,11 +15,37 @@ $("document").ready(function() {
     window.babe_monitor = babeInit({
         // You have to specify all views you want to use in this experiment and the order of them
         views_seq: [
+            /*
             intro,
             instructions,
             forced_choice_2A,
             post_test,
             thanks,
+            */
+
+
+            intro_welcome,
+            intro_resolution,
+
+            test_instruction,
+            test_vision,
+            test_color,
+
+            b1_instruction,
+            b1_exp,
+
+
+
+            b2_instruction,
+            b2_exp,
+
+            outro_data,
+            // ANDERE SACHEN WEGMACHEN
+
+            // WARUM GEHT DAS NICHT?
+
+            //outro_consent,
+            //outro_thanks,
         ],
         // Here, you can specify all information for the deployment
         deploy: {

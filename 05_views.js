@@ -31,7 +31,7 @@ const intro = babeViews.view_generator("intro",{
             <br />
             <br />
             This is a minimal experiment with one forced choice view. It can serve as a starting point for programming your own experiment.`,
-   buttonText: 'Begin the experiment'    
+   buttonText: 'Begin the experiment'
 });
 
 // For most tasks, you need instructions views
@@ -118,3 +118,98 @@ const forced_choice_2A = babeViews.view_generator("forced_choice", {
 // There are many more templates available:
 // forced_choice, slider_rating, dropdown_choice, testbox_input, rating_scale, image_selection, sentence_choice,
 // key_press, self_paced_reading and self_paced_reading_rating_scale
+
+
+
+
+const intro_welcome = babeViews.view_generator("intro",{
+    trials: 1,
+    name: 'intro_welcome',
+    title: 'WELCOME',
+    text: 'This is the welcome screen ...',
+    buttonText: 'Start'
+});
+
+const intro_resolution = babeViews.view_generator("intro",{
+    trials: 1,
+    name: 'intro_resolution',
+    title: 'RESOLUTION CHECK',
+    text: 'Check your screen resolution here ...',
+    buttonText: 'Continue'
+});
+
+const test_instruction = babeViews.view_generator("instructions",{
+    trials: 1,
+    name: 'test_instruction',
+    title: 'TEST INSTRUCTION',
+    text: 'We will check your eyes soon ...',
+    buttonText: 'Start Test'
+});
+
+const test_vision_options = babeViews.view_generator("forced_choice", {
+    trials: trial_info.snellen.length,
+    name: 'test_vision_options',
+    data: trial_info.snellen,
+});
+
+const test_vision = babeViews.view_generator("textbox_input", {
+    trials: trial_info.snellen2.length,
+    name: 'test_vision',
+    data: trial_info.snellen2,
+});
+
+const test_color = babeViews.view_generator("textbox_input", {
+    trials: trial_info.ishihara.length,
+    name: 'test_color',
+    data: trial_info.ishihara,
+});
+
+const b1_instruction = babeViews.view_generator("instructions",{
+    trials: 1,
+    name: 'b1_instruction',
+    title: 'BLOCK 1 - INSTRUCTION',
+    text: 'First Part of Experiment starts here ...',
+    buttonText: 'Start Block 1'
+});
+
+const b1_exp = babeViews.view_generator("rating_scale", {
+    trials: trial_info.b1_exp.length,
+    name: 'b1_exp',
+    data: trial_info.b1_exp,
+});
+
+const b2_instruction = babeViews.view_generator("instructions",{
+    trials: 1,
+    name: 'b2_instruction',
+    title: 'BLOCK 2 - INSTRUCTION',
+    text: 'Second Part of Experiment starts here ...',
+    buttonText: 'Start Block 2'
+});
+
+const b2_exp = babeViews.view_generator("rating_scale", {
+    trials: trial_info.b2_exp.length,
+    name: 'b2_exp',
+    data: trial_info.b2_exp,
+});
+
+const outro_data = babeViews.view_generator("post_test",{
+    trials: 1,
+    name: 'outro_data',
+    title: 'YOUR DATA',
+    text: 'Type in your shit here ...',
+    age_question: 'Age',
+    gender_question: 'Gender',
+    buttonText: 'Next',
+});
+
+const outro_consent = babeViews.view_generator("thanks",{
+    trials: 1,
+    name: 'outro_consent',
+    title: 'CONSENT',
+    prolificConfirmText: 'Give your most private data to us, we sell it to facebook :)',
+});
+
+const outro_thanks = babeViews.view_generator("thanks",{
+    trials: 1,
+    name: 'outro_thanks',
+});
