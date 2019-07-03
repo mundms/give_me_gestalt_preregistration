@@ -5,7 +5,7 @@ const intro_welcome = babeViews.view_generator("intro",{
     trials: 1,
     name: 'intro_welcome',
     title: 'WELCOME',
-    text: 'If you consider yourself an expert in Cubist art or were ever engaged in any kind of cubist art education, please do NOT take part in this experiment! <br> Please do NOT use a mobile device to do this experiment, instead use a PC or Laptop!',
+    text: 'Thank you for your interest in this experiment. <br><br>If you consider yourself an expert in Cubist art or were ever engaged in any kind of cubist art education, please do NOT take part in this experiment! Please use a PC or Laptop instead of a mobile device.',
     buttonText: 'Start'
 });
 
@@ -21,8 +21,8 @@ const test_instruction = babeViews.view_generator("instructions",{
     trials: 1,
     name: 'test_instruction',
     title: 'TEST INSTRUCTION',
-    text: 'We will check your eyes soon ... <br>Make sure that the distance between you and the screen is about an arm´s length',
-    buttonText: 'Start Test',
+    text: 'We will check your eyes soon. Make sure that the distance between you and the screen is about an arm\'s length and remains constant throughout the experiment!',
+    buttonText: 'Start',
 });
 
 const test_snellen = babeViews.view_generator("textbox_input", {
@@ -35,8 +35,8 @@ const b1_instruction = babeViews.view_generator("instructions",{
     trials: 1,
     name: 'b1_instruction',
     title: 'BLOCK 1 - INSTRUCTION',
-    text: 'First Part of Experiment starts here ...',
-    buttonText: 'Start Block 1'
+    text: 'First part of the experiment starts here ...',
+    buttonText: 'Start'
 });
 
 const b1_exp = babeViews.view_generator("rating_scale", {
@@ -49,8 +49,8 @@ const b2_instruction = babeViews.view_generator("instructions",{
     trials: 1,
     name: 'b2_instruction',
     title: 'BLOCK 2 - INSTRUCTION',
-    text: 'Second Part of Experiment starts here ...',
-    buttonText: 'Start Block 2'
+    text: 'Second part of the experiment starts here ...',
+    buttonText: 'Start'
 });
 
 const b2_exp = babeViews.view_generator("rating_scale", {
@@ -73,7 +73,7 @@ const outro_data = babeViews.view_generator("post_test",{
     trials: 1,
     name: 'outro_data',
     title: 'YOUR DATA',
-    text: 'Feel free to answer the following questions ...',
+    text: 'It is completely voluntary to provide the following data, but helps us to better evaluate the experiment.',
 },{
   answer_container_generator: function(config, CT) {
       const quest = babeUtils.view.fill_defaults_post_test(config);

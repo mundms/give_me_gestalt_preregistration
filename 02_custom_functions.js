@@ -22,7 +22,7 @@ const coin = _.sample(["head", "tail"]); // You can determine global (random) pa
 let b1_trails = [];
 let b2_trails = [];
 let path = 'images/stimuli/';
-let totalFiles = 3;
+let totalFiles = 60;
 
 var randomArray01 = createRandomArray();
 var randomArray02 = createRandomArray();
