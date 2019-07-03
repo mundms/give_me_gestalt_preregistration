@@ -15,37 +15,22 @@ $("document").ready(function() {
     window.babe_monitor = babeInit({
         // You have to specify all views you want to use in this experiment and the order of them
         views_seq: [
-            /*
-            intro,
-            instructions,
-            forced_choice_2A,
-            post_test,
-            thanks,
-            */
-
 
             intro_welcome,
             intro_resolution,
 
             test_instruction,
-            test_vision,
-            test_color,
+            test_snellen,
 
             b1_instruction,
             b1_exp,
-
-
 
             b2_instruction,
             b2_exp,
 
             outro_data,
-            // ANDERE SACHEN WEGMACHEN
-
-            // WARUM GEHT DAS NICHT?
-
-            //outro_consent,
-            //outro_thanks,
+            outro_consent,
+            outro_thanks,
         ],
         // Here, you can specify all information for the deployment
         deploy: {
@@ -54,7 +39,7 @@ $("document").ready(function() {
             // Possible deployment methods are:
             // "debug" and "directLink"
             // As well as "MTurk", "MTurkSandbox" and "Prolific"
-            deployMethod: "debug",
+            deployMethod: "directLink",
             contact_email: "YOUREMAIL@wherelifeisgreat.you",
             prolificURL: "https://app.prolific.ac/submissions/complete?cc=SAMPLE1234"
         },
@@ -62,7 +47,8 @@ $("document").ready(function() {
         progress_bar: {
             in: [
                 // list the view-names of the views for which you want a progress bar
-                forced_choice_2A.name,
+                b1_exp.name,
+                b2_exp.name,
             ],
              // Possible styles are "default", "separate" and "chunks"
             style: "separate",
