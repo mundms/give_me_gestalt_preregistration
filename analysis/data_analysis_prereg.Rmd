@@ -102,6 +102,6 @@ Step 6. Make a boxplot of the data.
 (This data is not representive since this is only test data.)
 
 ```{r}
-ggplot(final_data, aes(x = mean_Detect, y = mean_Like)) + geom_point()
+ggplot(final_data, aes(x = mean_Detect, y = mean_Like)) + geom_point() + geom_smooth(method = "lm")
 ```
 
