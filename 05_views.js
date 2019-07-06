@@ -29,7 +29,62 @@ const test_snellen = babeViews.view_generator("textbox_input", {
     trials: trial_info.snellen.length,
     name: 'test_snellen',
     data: trial_info.snellen,
+},{
+    answer_container_generator: function(config, CT) {
+        return `<p class='babe-view-question'>${config.data[CT].question}</p>
+                    <div class='babe-view-answer-container'>
+                        <textarea name='textbox-input' rows=1 cols=1 class='babe-response-text' />
+                    </div>
+                    <button id='next' class='babe-view-button babe-nodisplay'>next</button>`;
+    },
+    handle_response_function: function(config, CT, babe, answer_container_generator, startingTime) {
+        let next;
+        let textInput;
+        const minChars = config.data[CT].min_chars === undefined ? 10 : config.data[CT].min_chars;
+
+        $(".babe-view").append(answer_container_generator(config, CT));
+
+        next = $("#next");
+        textInput = $("textarea");
+
+        // attaches an event listener to the textbox input
+        textInput.on("keyup", function() {
+            // if the text is longer than (in this case) 10 characters without the spaces
+            // the 'next' button appears
+            if (textInput.val().trim().length > minChars) {
+                next.removeClass("babe-nodisplay");
+            } else {
+                next.addClass("babe-nodisplay");
+            }
+        });
+
+        // the trial data gets added to the trial object
+        next.on("click", function() {
+            const RT = Date.now() - startingTime; // measure RT before anything else
+            let trial_data = {
+                trial_name: config.name,
+                trial_number: CT + 1,
+                response: textInput.val().trim(),
+                RT: RT
+            };
+
+            babe.global_data.snellen_result = textInput.val().trim(),
+
+            trial_data = babeUtils.view.save_config_trial_data(config.data[CT], trial_data);
+
+            babe.trial_data.push(trial_data);
+            babe.findNextView();
+        });
+    },
 });
+
+/**
+const test_snellen_ALT = babeViews.view_generator("textbox_input", {
+    trials: trial_info.snellen.length,
+    name: 'test_snellen',
+    data: trial_info.snellen,
+});
+**/
 
 const b1_instruction = babeViews.view_generator("instructions",{
     trials: 1,
