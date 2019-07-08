@@ -1,4 +1,3 @@
-// In this file you initialize and configure your experiment using babeInit
 
 $("document").ready(function() {
     // prevent scrolling when space is pressed
@@ -15,7 +14,6 @@ $("document").ready(function() {
     window.babe_monitor = babeInit({
         // You have to specify all views you want to use in this experiment and the order of them
         views_seq: [
-
             intro_welcome,
             intro_resolution,
 
@@ -29,7 +27,6 @@ $("document").ready(function() {
             b2_exp,
 
             outro_data,
-            // outro_consent,
             outro_thanks,
         ],
         // Here, you can specify all information for the deployment
@@ -40,7 +37,7 @@ $("document").ready(function() {
             // "debug" and "directLink"
             // As well as "MTurk", "MTurkSandbox" and "Prolific"
             deployMethod: "directLink",
-            //deployMethod: "debug",
+            // deployMethod: "debug",
             contact_email: "YOUREMAIL@wherelifeisgreat.you",
             prolificURL: "https://app.prolific.ac/submissions/complete?cc=SAMPLE1234"
         },

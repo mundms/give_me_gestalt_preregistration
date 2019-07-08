@@ -1,11 +1,9 @@
 
-
-
 const intro_welcome = babeViews.view_generator("intro",{
     trials: 1,
     name: 'intro_welcome',
     title: 'WELCOME',
-    text: 'Thank you for your interest in this experiment. <br><br>If you consider yourself an expert in Cubist art or were ever engaged in any kind of cubist art education, please do NOT take part in this experiment! Please use a PC or Laptop instead of a mobile device.',
+    text: 'Thank you for your interest in this experiment. <br/><br/>If you consider yourself an expert in Cubist art or were ever engaged in any kind of cubist art education, <strong>please do NOT take part in this experiment!</strong> Make sure you use a <strong>PC or Laptop</strong> instead of a mobile device.',
     buttonText: 'Start'
 });
 
@@ -13,7 +11,7 @@ const intro_resolution = babeViews.view_generator("intro",{
     trials: 1,
     name: 'intro_resolution',
     title: 'RESOLUTION CHECK',
-    text: 'Make sure that the following image has the same size as a normal credit card. If not, please resize your browser-viewport (by pressing Ctrl and + or - in most browsers).   <img src="images/resolution/card02.png" alt="card" height="370"> ',
+    text: 'Please resize your browser-viewport so that the following image has the same size as a normal credit card. You can do that by pressing <strong>Ctrl</strong> and <strong>+</strong> or <strong>-</strong> in most browsers.   <img src="images/resolution/card.png" alt="card" height="370"> ',
     buttonText: 'Continue',
 });
 
@@ -21,7 +19,7 @@ const test_instruction = babeViews.view_generator("instructions",{
     trials: 1,
     name: 'test_instruction',
     title: 'TEST INSTRUCTION',
-    text: 'We will check your eyes soon. Make sure that the distance between you and the screen is about an arm\'s length and remains constant throughout the experiment!',
+    text: 'We will check your eyes soon. Make sure that the distance between you and the screen is about <strong>an arm\'s length</strong> and <strong>remains constant</strong> throughout the experiment!',
     buttonText: 'Start',
 });
 
@@ -78,19 +76,11 @@ const test_snellen = babeViews.view_generator("textbox_input", {
     },
 });
 
-/**
-const test_snellen_ALT = babeViews.view_generator("textbox_input", {
-    trials: trial_info.snellen.length,
-    name: 'test_snellen',
-    data: trial_info.snellen,
-});
-**/
-
 const b1_instruction = babeViews.view_generator("instructions",{
     trials: 1,
     name: 'b1_instruction',
     title: 'BLOCK 1 - INSTRUCTION',
-    text: 'First part of the experiment starts here ...',
+    text: 'The first part of the experiment starts here. <br/><br/>You will now be shown some black and white photos of paintings one after the other. Please rate each painting using the scale below on <strong>how much you like it</strong> (1 being "not at all" and 7 being "very much"). Take your time and look at the paintings carefully before you rate them! <br/><br/>When you are ready, press the button to start the experiment ...',
     buttonText: 'Start'
 });
 
@@ -104,8 +94,8 @@ const b2_instruction = babeViews.view_generator("instructions",{
     trials: 1,
     name: 'b2_instruction',
     title: 'BLOCK 2 - INSTRUCTION',
-    text: 'Second part of the experiment starts here ...',
-    buttonText: 'Start'
+    text: 'Take a short break and relax your eyes! <br/><br/>The second part of the experiment starts here. Again you will be shown some black and white photos of paintings one after the other. This time please rate each painting using the scale below on <strong>how well you can identify patterns in that painting </strong>(1 being "not at all" and 7 being "very much"). Take your time and look at the paintings carefully before you rate them! <br/><br/>When you are ready, press the button to continue the experiment ...',
+    buttonText: 'Continue'
 });
 
 const b2_exp = babeViews.view_generator("rating_scale", {
@@ -114,21 +104,12 @@ const b2_exp = babeViews.view_generator("rating_scale", {
     data: trial_info.b2_exp,
 });
 
-const outro_data_alt = babeViews.view_generator("post_test",{
-    trials: 1,
-    name: 'outro_data',
-    title: 'YOUR DATA',
-    text: 'Type in your shit here ...',
-    age_question: 'Age',
-    gender_question: 'Gender',
-    buttonText: 'Next',
-});
-
 const outro_data = babeViews.view_generator("post_test",{
     trials: 1,
     name: 'outro_data',
     title: 'YOUR DATA',
-    text: 'It is completely voluntary to provide the following data, but helps us to better evaluate the experiment.',
+    text: '<strong>Don\'t close the window yet! </strong><br/><br/>Please click on "Submit" to complete the experiment and ensure that all your results will be sent. <br/><br/>It is completely voluntary to provide the following data, but helps us to better evaluate the experiment.',
+    buttonText: 'Submit',
 },{
   answer_container_generator: function(config, CT) {
       const quest = babeUtils.view.fill_defaults_post_test(config);
@@ -144,7 +125,7 @@ const outro_data = babeViews.view_generator("post_test",{
                           <option value="${quest.gender.male}">${quest.gender.male}</option>
                           <option value="${quest.gender.female}">${quest.gender.female}</option>
                           <option value="divers">divers</option>
-                          <option value="NA">not want to specify</option>
+                          <!-- <option value="NA">not want to specify</option> -->
                       </select>
                   </p>
                   <p class="babe-view-text">
@@ -154,13 +135,6 @@ const outro_data = babeViews.view_generator("post_test",{
                   <button id="next" class='babe-view-button'>${config.button}</button>
           </form>`
   },
-});
-
-const outro_consent = babeViews.view_generator("thanks",{
-    trials: 1,
-    name: 'outro_consent',
-    title: 'CONSENT',
-    prolificConfirmText: 'Give your most private data to us, we sell it to facebook :)',
 });
 
 const outro_thanks = babeViews.view_generator("thanks",{
