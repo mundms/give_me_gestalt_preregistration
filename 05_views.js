@@ -94,7 +94,7 @@ const b2_instruction = babeViews.view_generator("instructions",{
     trials: 1,
     name: 'b2_instruction',
     title: 'BLOCK 2 - INSTRUCTION',
-    text: 'Take a short break and relax your eyes! <br/><br/>The second part of the experiment starts here. Again you will be shown some black and white photos of paintings one after the other. This time please rate each painting using the scale below on <strong>how well you can identify patterns in that painting </strong>(1 being "not at all" and 7 being "very much"). Take your time and look at the paintings carefully before you rate them! <br/><br/>When you are ready, press the button to continue the experiment ...',
+    text: 'Take a short break and relax your eyes! Keep in mind that the distance to the screen should remain approximately one arm\'s length. <br/><br/>The second part of the experiment starts here. Again you will be shown some black and white photos of paintings one after the other. This time please rate each painting using the scale below on <strong>how well you can identify patterns in that painting </strong>(1 being "not at all" and 7 being "very much"). Take your time and look at the paintings carefully before you rate them! <br/><br/>When you are ready, press the button to continue the experiment ...',
     buttonText: 'Continue'
 });
 
@@ -108,7 +108,7 @@ const outro_data = babeViews.view_generator("post_test",{
     trials: 1,
     name: 'outro_data',
     title: 'YOUR DATA',
-    text: '<strong>Don\'t close the window yet! </strong><br/><br/>Please click on "Submit" to complete the experiment and ensure that all your results will be sent. <br/><br/>It is completely voluntary to provide the following data, but helps us to better evaluate the experiment.',
+    text: '<strong>Don\'t close the window yet! </strong><br/><br/>Please click on "Submit" to complete the experiment and ensure that your results will be sent. <br/><br/>It is completely voluntary to provide the following data, but improves our evalutation of the experiment.',
     buttonText: 'Submit',
 },{
   answer_container_generator: function(config, CT) {
