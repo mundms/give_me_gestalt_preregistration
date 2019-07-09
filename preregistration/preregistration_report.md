@@ -8,13 +8,20 @@ we reduced stimuli to the monochrome images to see if the result are still as cl
 
 
 # Research questions
-Is there a positive relation between the recognition of patterns and structures and the likleness of a cubist painting?
+Is there a positive relation between the recognition of patterns and structures and the likeliness of a cubist painting?
+
+# Hypothesis
+With a higher pattern detectabity in a cubist painting the participant's likeliness of the painting is also higher.
+
+
 
 # Design of the Experiment
 
 ## General remarks about the design
 
-It is a one factorial subject study?
+It is a one factorial subject study with two variables "likeliness" and "detectability". Our variables are dependent, because we assume that the likeliness of a painting is linked to pattern recognition within the painting. The variable likeliness is asked with the question "How much do you like this painting?" and the variable detectability is asked with the question "How well can you identify patterns in this painting?". Each variable is messured on a 7 point ordinal scale from 1 being "not at all" to 7 being "very much". The design of the study is within-subjects.
+
+
 
 ## Sampling plan
 
@@ -27,67 +34,69 @@ Potential participants include: <br>
 
 ### Restrictions
 - people with impaired vision without correction (shortsightedness/longsightedness)
-- people with expertise in cubist art
 
 
 ## Materials
-To garantee a data acquisition as similar as possible to the original experiment we use the same material. 
+To guarantee a data acquisition as similar as possible to the original experiment we use the same material. 
    - To ensure normal/corrected-to-normal vision: <br>
      * Standard Snellen's eye chart test <br>
-   - the images of the Black and white cubist paintings (from now on only to be called images) from the original experiment <br>
-     * 60 cubist Paintings: Pablo Picasso (22), Georges Braque (18) and Juan Gris (20) <br>
+   - the images of monochrome cubist paintings (from now on only to be called images) from the original experiment <br>
+     * 60 cubist paintings: Pablo Picasso (22), Georges Braque (18) and Juan Gris (20) <br>
      * the images are adapted to 450 pixels width and 600 pixels height <br>
-     * there are only monochrome images <br>
    
 
 ## Procedure
-The exeriment is conducted as a browser experiment participants can access online. It is diveded in three major blocks, first the introduction, used to explain the following tasks and to perform vision tests and request former knowledge in cubist art, followed by the main experiment which consists of two blocks.
+The experiment is conducted as a browser experiment participants can access online. It is divided into the following sections: 
 
-### Introduction
-The introduction part consistis of following sections. <br>
-1. Welcome message and short describtion of the procedure in general. <br>
-2. Request about former knowledge in cubist art: <br>
-   * „Do you consider yourself an expert in Cubist art or were you ever engaged in any kind of cubist art education?“ <br>
-   * Participants who answer "Yes" have to be excluded after data aquisition. <br>
-3. Snellen's Eye Chart Test: We will show the participent a snellen chart and ask them to write down from which line they find it difficult to read.  <br>
-4. Ensuring approx. Same size of images and vision tests every screen for all participants.  <br>
+#### 1. Introduction and Preparation
+1.1 Welcome<br>
+1.2 Resolution Check<br>
+1.3 Snellen Test<br>
+1.4 Question about expertise in cubist art<br>
+
+#### 2. Experiment
+2.1 Block 1: Rating of Likeliness<br>
+2.2 Block 2: Rating of Detectablitiy<br>
+
+#### 3. Outro
+3.1 Data Form<br>
+3.2 Thanks<br>
+
+
+### 1. Introduction and Preparation
+First we welcome the participants and ask them to use a PC or Laptop. We ensure that all participants see the experiment in approximately the same resolution by letting them match a credit card to an outline of a credit card presented on the screen. After setting the viewport we check the eyesight of the participants with the Snellen's Eye Chart Test. We will show the participent a snellen chart and ask them to write down the number of the last row where they can recognise all letters.
  
 
-### Experiment Part 1: Preference Rating
-1. Description of the task <br>
-2. Task itself: <br>
-    * Participants are shown 60 Stimuli in randomized order <br>
-    * Each image has to be rated on liking using a 7-point-Likert-scale from 1 ('not at all') to 7 ('very') <br>
-  
-### Experiment Part 2: Detectability
-1. Description of the task<br>
-2. Task itself: <br>
-    * Participants are shown same 60 Stimuli in randomized order <br>
-    * Each image has to be rated on how well object can be detected using a 7-point-Likert-scale from 1 ('not at all') to 7 ('very') <br>
-  
-### Closing Part
+### 2. Experiment
+The experiment section consists of two blocks. In each block 60 images are shown to the participants in randomized order. Both blocks contain the same 60 images. The order of the blocks is fixed. We want to test the likeliness of the images first to let the participants get an overall impression of the images without looking too closely at the structure as the participants are asked to do in the second block. The image rating and the questions asked are as described in the general remarks about the design (7-point-scale).
 
-Last part consists of a Consent Form which asks the participent to allow us to use their data for our project. And a
-thank you message saying 'Thank you for your participation'.
+
+### 3. Outro
+
+In the last section the participants can provide personal information including age, gender and further comments. This information is voluntary. After pressing the "Submit" button the data will be sent and a thank you message is shown.
 
 ## Measured variables
-The data aquisition will assign several values from an ordninal skala from 1 to 7 (see above) to each image for <br>
+The data aquisition will assign several values from an ordninal scale from 1 to 7 (see general remarks about the design) to each image for <br>
 - Detactability (X) <br>
 - Linking (Y) <br>
-such that for each picture an average value can be computed.
+such that for each image an average value can be computed. We try to find out more about the dependency of the variables. <br>
+We also collect control variables namely the result of the Snellen's eye chart test ("snellen_result"), prior knowledge about cubist art ("is_expert", dichotom), age and gender. We reserve the right to evaluate people with expertise in cubist art differently because they might have seen the presented paintings beforehand and therfore could be influenced by their prior knowledge about the painting. Apart from that we assume that they might have different opinions on what makes a cubist painting likeable.
+
 
 # Analysis Plan
 
 ## Exclusion criteria
-1. for single image/trial data: <br>
-    * if they took > 2min to decide for one image (to ensure that the participant is not to distracted)<br>
-    * if they answered in < 3s <br>
-    * if they rated all likeliness/recognitions the same
-2. whole participant data excluded:<br>
-    * if 3 images answered in less than 3 sec<br>
-    * Whole participant excluded if they took longer than 3 min for each of 5 continuos paintings<br>
-    * if they do not pass vision test<br>
-    * if they have expertise in cubist art <br>
+
+Participants who tend to give always the same rating and therefore have much faster reaction times then average are excluded as well as participants who take to long to rate the images, because we assume that they are distracted and can not concentrate on the experiment anymore.
+
+1. a single trial will be excluded: <br>
+    * if the participant took more than 2 minutes to rate one image<br>
+    * if the participant answered in less than 3 seconds
+2. whole participant data will be excluded:<br>
+    * if the participant choose the same value for all images in likeliness or detectability
+    * if 5 images answered in less than 3 seconds<br>
+    * if the participant took twice the average experiment time or longer
+    * if the participant is not able to fully recognize row 7 anymore (snellen_result < 7)<br>
     
 ## Confirmatory hypothesis testing
 
