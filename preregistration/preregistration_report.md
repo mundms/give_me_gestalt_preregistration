@@ -96,8 +96,8 @@ We will run an additional analysis for participants who fail the Snellen's Eye C
 1. the dataset of a participant will be excluded if the participant choose the same value for all images in liking and/or detectability. <br>
 ACHTUNG WAS IST MIT STANDARD ABWEICHUNG?????????????????????????????????????????
 2. To detect outliers in terms of time taken for a single trial, we will generate the standart derivation of the RT distribution, because we assume that they are not interested or distracted. <br>
-
-3. We reserve the right to exclude people with expertise in cubist art in case their answers differ from the data of participants without expertise in cubist art. We decided to do that because they might have seen the presented paintings beforehand and therefore could be influenced by their prior knowledge about the paintings. Apart from that we assume that they might have different opinions on what makes a cubist painting likeable. In general, experts probably have higher scores in liking and are able to detect patterns better.
+3. To detect outliers in terms of liking or detectability for a single trial, we will generate the standart derivation of the their distributions.
+4. We reserve the right to exclude people with expertise in cubist art in case their answers differ from the data of participants without expertise in cubist art. We decided to do that because they might have seen the presented paintings beforehand and therefore could be influenced by their prior knowledge about the paintings. Apart from that we assume that they might have different opinions on what makes a cubist painting likeable. In general, experts probably have higher scores in liking and are able to detect patterns better.
 
     
 ## Confirmatory hypothesis testing
