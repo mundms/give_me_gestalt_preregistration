@@ -3,7 +3,7 @@ const intro_welcome = babeViews.view_generator("intro",{
     trials: 1,
     name: 'intro_welcome',
     title: 'WELCOME',
-    text: 'Thank you for your interest in this experiment. <br/><br/>If you consider yourself an expert in Cubist art or were ever engaged in any kind of cubist art education, <strong>please do NOT take part in this experiment!</strong> Make sure you use a <strong>PC or Laptop</strong> instead of a mobile device.',
+    text: 'Thank you for your interest in this experiment. <br/><br/>Make sure you use a <strong>PC or Laptop</strong> instead of a mobile device.',
     buttonText: 'Start'
 });
 
@@ -67,6 +67,38 @@ const test_snellen = babeViews.view_generator("textbox_input", {
             };
 
             babe.global_data.snellen_result = textInput.val().trim(),
+
+            trial_data = babeUtils.view.save_config_trial_data(config.data[CT], trial_data);
+
+            babe.trial_data.push(trial_data);
+            babe.findNextView();
+        });
+    },
+});
+
+const b0_expert = babeViews.view_generator("forced_choice", {
+    trials: trial_info.expert.length,
+    title: 'QUESTION',
+    name: 'b0_expert',
+    data: trial_info.expert,
+},{
+    handle_response_function: function(config, CT, babe, answer_container_generator, startingTime) {
+        $(".babe-view").append(answer_container_generator(config, CT));
+
+        // attaches an event listener to the yes / no radio inputs
+        // when an input is selected a response property with a value equal
+        // to the answer is added to the trial object
+        // as well as a readingTimes property with value
+        $("input[name=answer]").on("change", function() {
+            const RT = Date.now() - startingTime;
+            let trial_data = {
+                trial_name: config.name,
+                trial_number: CT + 1,
+                response: $("input[name=answer]:checked").val(),
+                RT: RT
+            };
+
+            babe.global_data.is_expert = $("input[name=answer]:checked").val(),
 
             trial_data = babeUtils.view.save_config_trial_data(config.data[CT], trial_data);
 

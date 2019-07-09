@@ -20,6 +20,8 @@ $("document").ready(function() {
             test_instruction,
             test_snellen,
 
+            b0_expert,
+
             b1_instruction,
             b1_exp,
 
