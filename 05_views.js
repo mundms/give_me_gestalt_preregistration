@@ -3,7 +3,7 @@ const intro_welcome = babeViews.view_generator("intro",{
     trials: 1,
     name: 'intro_welcome',
     title: 'WELCOME',
-    text: 'Thank you for your interest in this experiment. <br/><br/>Make sure you use a <strong>PC or Laptop</strong> instead of a mobile device.',
+    text: 'Thank you for your interest in this experiment. <br/><br/>Make sure you use a <strong>PC or Laptop</strong>.',
     buttonText: 'Start'
 });
 
