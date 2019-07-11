@@ -1,0 +1,186 @@
+---
+title: "Data Analysis for Give me Gestalt - Cubist Art Experiment"
+Authors: "Group 03"
+---
+
+# Instructions
+
+## Required R packages
+* `tidyverse` (or `ggplot2`, `dplyr`, `purrr`, `tibble`)
+* `brms`
+* `devtools` (for installing `faintr`)
+* `rstan`
+* `faintr` (install with `devtools`)
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = F, message = F)
+
+```
+
+Load the required packages and set a seed for the random number generator.
+```{r}
+library(tidyverse)
+
+library(rstan)
+# set cores to use to the total number of cores (minimally 4)
+options(mc.cores = max(parallel::detectCores(), 4))
+# save a compiled version of the Stan model file
+rstan_options(auto_write = TRUE)
+
+library(brms)
+
+# install faintr with devtools::install_github('michael-franke/bayes_mixed_regression_tutorial/faintr', build_vignettes = TRUE))
+library(faintr)
+
+set.seed(123)
+
+```
+
+Step 1. Read the data and take a glimpse of it.
+---
+
+```{r}
+data_raw <- read_csv("testdata.csv")
+glimpse(data_raw)
+```
+
+
+Step 2. Select only the columns of interest and filter trials that are not interesting for the calculations.
+Change data type of the responses to double.
+---
+
+```{r}
+data_selection <- select(data_raw, submission_id, snellen_result, is_expert, trial_name, trial_number, fileID, response, RT, timeSpent)
+data_filtered <- filter(data_selection, trial_name != "test_snellen", trial_name != "b0_expert")
+data_mut <- mutate(data_filtered, response = as.double(response), submission_id = factor(submission_id))
+
+show(data_selection)
+show(data_filtered)
+show(data_mut)
+
+```
+
+
+Step 3. Split data according to trial (b1: Liking, b2: Detactability).
+---
+
+```{r}
+data_b1 <- filter(data_mut, trial_name == "b1_exp")
+data_b2 <- filter(data_mut, trial_name == "b2_exp")
+
+show(data_b1)
+show(data_b2)
+```
+
+Step 4. Generate table with needed data in useful format.
+---
+
+```{r}
+data_b1_mutated <- mutate(data_b1, liking = response, RT_liking = RT)
+data_b2_mutated <- mutate(data_b2, detectability = response, RT_detectability = RT)
+
+data_b1_selected <- select(data_b1_mutated, fileID, submission_id, snellen_result, timeSpent, liking, RT_liking)
+data_b2_selected <- select(data_b2_mutated, fileID, submission_id, snellen_result, timeSpent, detectability, RT_detectability)
+
+data_b1_orderd <- data_b1_selected[order(data_b1_selected$fileID),]
+data_b2_orderd <- data_b2_selected[order(data_b2_selected$fileID),]
+
+merged_data <- data_b1_orderd
+merged_data$detectability <- data_b2_orderd$detectability
+merged_data$RT_detectability <- data_b2_orderd$RT_detectability
+
+show(data_b1_selected)
+show(data_b2_selected)
+show(data_b1_orderd)
+show(data_b2_orderd)
+show(merged_data)
+
+final_data <- as_tibble(merged_data)
+show(final_data)
+```
+
+Step 5.Test assumptions for linear regression.
+---
+Normality:
+```{r}
+likingScore <- data_b1$response
+likingScore
+shapiro.test(likingScore)
+DetectScore <- data_b2$response
+DetectScore
+shapiro.test(DetectScore)
+```
+Further assumptions:
+```{r}
+hist(final_data$liking)
+hist(final_data$detectability)
+par(mfrow=c(2,2))
+typeof(final_data)
+
+mod <- lm(final_data$liking ~ final_data$detectability, data=final_data)
+gvlma::gvlma(mod)
+```
+
+Step 6. Make a boxplot of the data.
+---
+(This data is not representive since this is only random test data.)
+
+```{r}
+cor(final_data$liking, final_data$detectability)
+scatter.smooth(y=final_data$liking, x= final_data$detectability, xlab = "Detection Scores", ylab = "Liking Scores")
+ggplot(final_data, aes(x = detectability, y = liking)) + geom_jitter(height = 0.25, width = 0.25) + xlim(1,7) + ylim(1,7) + geom_smooth(method = "lm")
+```
+
+Step 7. Run bayesian fixed-effects models
+---
+Change datatype of liking and detectability to integer to use brm for cumulative family.
+
+```{r}
+final_data_mutated <- mutate(final_data, liking = as.integer(liking), detectability = as.integer(detectability))
+show(final_data_mutated)
+
+brm_data_cumulative <- brm(formula=liking ~ mo(detectability), data=final_data_mutated, family = "cumulative")
+summary(brm_data_cumulative)
+```
+
+Cumulative family for mixed/random effects:
+```{r}
+brm_mixed <- brm(formula=liking ~ mo(detectability) + (1|submission_id), data=final_data_mutated, family = "cumulative")
+summary(brm_mixed)
+```
+
+```{r}
+brm_mixed2 <- brm(formula=liking ~ mo(detectability) + (1|submission_id) + (1|fileID), data=final_data_mutated, family = "cumulative")
+summary(brm_mixed2)
+```
+
+Step 8. Compare different bmr models.
+---
+```{r}
+
+loo(brm_data_cumulative, brm_mixed)
+
+```
+
+```{r}
+
+loo(brm_data_cumulative, brm_mixed2)
+
+```
+
+```{r}
+
+loo(brm_mixed, brm_mixed2)
+
+```
+
+Plotting:
+```{r}
+
+plot(brm_mixed)
+```
+
+```{r}
+marginal_effects(brm_mixed)
+
+```
