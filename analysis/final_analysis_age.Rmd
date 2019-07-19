@@ -1,0 +1,176 @@
+---
+title: "Data Analysis for Give me Gestalt - Cubist Art Experiment"
+output: pdf_document
+Authors: Group 03
+---
+
+# Instructions
+
+## Required R packages
+* `tidyverse` (or `ggplot2`, `dplyr`, `purrr`, `tibble`)
+* `brms`
+* `devtools` (for installing `faintr`)
+* `rstan`
+* `faintr` (install with `devtools`)
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = F, message = F)
+
+```
+
+Load the required packages and set a seed for the random number generator.
+```{r}
+library(tidyverse)
+
+library(rstan)
+# set cores to use to the total number of cores (minimally 4)
+options(mc.cores = max(parallel::detectCores(), 4))
+# save a compiled version of the Stan model file
+rstan_options(auto_write = TRUE)
+
+library(brms)
+
+library(gmodels)
+
+# install faintr with devtools::install_github('michael-franke/bayes_mixed_regression_tutorial/faintr', build_vignettes = TRUE))
+library(faintr)
+
+set.seed(123)
+
+```
+
+Step 1. Read the data and take a glimpse of it.
+---
+
+```{r}
+data_raw <- read_csv("results_71_givemegestalt_group3_group3.csv")
+glimpse(data_raw)
+```
+
+
+Step 2. Select only the columns of interest and filter trials that are not interesting for the calculations.
+Change data type of the responses to double and submission_id to factor. Detect outliers and special features like experts and failed vision test.
+---
+
+```{r}
+data_selection <- select(data_raw, submission_id, snellen_result, is_expert, age, gender, trial_name, trial_number, fileID, response, RT, timeSpent, comments)
+data_filtered <- filter(data_selection, trial_name != "test_snellen", trial_name != "b0_expert")
+data_mut <- mutate(data_filtered, response = as.double(response), submission_id = factor(submission_id))
+
+show(data_selection)
+show(data_filtered)
+show(data_mut)
+
+# 3 participants only rated "1" in both blocks, one participant only rated "7", one gave a invalid input for the Snellen test, we exclude them:
+data_clean <- filter(data_mut, submission_id != 607, submission_id != 736, submission_id != 475, submission_id != 480, submission_id != 726)
+show(data_clean)
+
+#ci(data_clean0$RT,)
+#data_clean <- filter(data_clean0, RT > 3646.158, RT < 7899.604)
+#show(data_clean)
+```
+Demografics
+---
+```{r}
+data_rawdemografics <- select(data_clean, submission_id, age, gender, is_expert, snellen_result, comments)
+data_demografics <- dplyr::distinct(group_by(data_rawdemografics, submission_id))
+show(data_demografics[order(data_demografics$submission_id),])
+```
+
+Total number of participents:
+```{r}
+length(unique(data_clean$submission_id))
+```
+Detecting the gender data provided and their count:
+```{r}
+data_gender_male <- filter(data_clean,gender == "male")
+data_gender_female <- filter(data_clean,gender == "female")
+data_gender_diverse <- filter(data_clean,gender == "divers")
+length(data_gender_male$gender)/120
+length(data_gender_female$gender)/120
+length(data_gender_diverse$gender)/120
+sum(is.na(data_clean$gender))/120 # counting how many NA are there.
+```
+There are total 33 male participents, 58 female and 2 of them identify teir gender as diverse and 2 of them did not submitted the data about gender.
+
+Data set according to age :
+```{r}
+data_age_below_20 <- filter(data_clean,age <= 19)
+data_age_20_40<-filter(data_clean,age>=20&age<=40)
+data_age_ab_40 <- filter(data_clean,age > 40)
+#divide by 122 beacuse there are 122 entries per person
+length(data_age_below_20$age)/120 
+length(data_age_20_40$age)/120
+length(data_age_ab_40$age)/120
+sum(is.na(data_clean$age))/120
+```
+From total participants there are total 14 participants, who are below age of 20, 70 are in range of 20 - 40 and 10 are in range of 41 to 63. 1 participants did not give data for age.
+
+Step 3. Split data according to trial (b1: Liking, b2: Detactability) and special features.
+---
+
+```{r}
+#Data with all participants
+data_b1 <- filter(data_clean, trial_name == "b1_exp")
+data_b2 <- filter(data_clean, trial_name == "b2_exp")
+```
+
+Step 4. Average data.
+Generate table with needed non-aggregated data in useful format.
+        
+---
+1. Data of all participants:
+```{r}
+# Averaged data:
+data_b1_mean <- group_by(data_b1, fileID) %>% summarise(mean_Like = mean(response))
+data_b2_mean <- group_by(data_b2, fileID) %>% summarise(mean_Detect = mean(response))
+
+show(data_b1_mean)
+show(data_b2_mean)
+
+final_data_mean <- merge(x = data_b2_mean, y = data_b1_mean, by = "fileID")
+show(final_data_mean)
+
+# Non-average data:
+data_b1_mutated <- mutate(data_b1, liking = response, RT_liking = RT)
+data_b2_mutated <- mutate(data_b2, detectability = response, RT_detectability = RT)
+
+data_b1_selected <- select(data_b1_mutated, fileID, submission_id, age, snellen_result, timeSpent, liking, RT_liking)
+data_b2_selected <- select(data_b2_mutated, fileID, submission_id, age, snellen_result, timeSpent, detectability, RT_detectability)
+
+data_b1_orderd <- data_b1_selected[order(data_b1_selected$fileID),]
+data_b2_orderd <- data_b2_selected[order(data_b2_selected$fileID),]
+
+merged_data <- data_b1_orderd
+merged_data$detectability <- data_b2_orderd$detectability
+merged_data$RT_detectability <- data_b2_orderd$RT_detectability
+
+show(data_b1_selected)
+show(data_b2_selected)
+show(data_b1_orderd)
+show(data_b2_orderd)
+show(merged_data)
+
+final_data <- as_tibble(merged_data)
+show(final_data)
+
+```
+
+Age
+```{r}
+data_b1_age <- group_by(data_b1, age) %>% summarise(mean_Like = mean(response))
+data_b2_age <- group_by(data_b2, age) %>% summarise(mean_Detect = mean(response))
+
+final_data_age0 <- merge(x = data_b2_age, y = data_b1_age, by = "age")
+final_data_age <- na.omit(final_data_age0) # delete NA.
+show(final_data_age)
+
+ggplot(final_data_age, aes(x = age, y = mean_Like)) + geom_point() + geom_smooth(method = "lm")
+ggplot(final_data_age, aes(x = age, y = mean_Detect)) + geom_point() + geom_smooth(method = "lm")
+
+cor(final_data_age$age, final_data_age$mean_Like)
+cor(final_data_age$age, final_data_age$mean_Detect)
+
+summary(lm(final_data_age$mean_Like ~ final_data_age$age))
+
+```

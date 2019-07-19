@@ -1,0 +1,277 @@
+---
+title: "Data Analysis for Give me Gestalt - Cubist Art Experiment"
+output: pdf_document
+Authors: Group 03
+---
+
+# Instructions
+
+## Required R packages
+* `tidyverse` (or `ggplot2`, `dplyr`, `purrr`, `tibble`)
+* `brms`
+* `devtools` (for installing `faintr`)
+* `rstan`
+* `faintr` (install with `devtools`)
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = F, message = F)
+
+```
+
+Load the required packages and set a seed for the random number generator.
+```{r}
+library(tidyverse)
+
+library(rstan)
+# set cores to use to the total number of cores (minimally 4)
+options(mc.cores = max(parallel::detectCores(), 4))
+# save a compiled version of the Stan model file
+rstan_options(auto_write = TRUE)
+
+library(brms)
+
+# install faintr with devtools::install_github('michael-franke/bayes_mixed_regression_tutorial/faintr', build_vignettes = TRUE))
+library(faintr)
+
+set.seed(123)
+
+```
+
+Step 1. Read the data and take a glimpse of it.
+---
+
+```{r}
+data_raw <- read_csv("results_71_givemegestalt_group3_group3.csv")
+glimpse(data_raw)
+```
+
+
+Step 2. Select only the columns of interest and filter trials that are not interesting for the calculations.
+Change data type of the responses to double and submission_id to factor. Detect outliers.
+---
+
+```{r}
+data_selection <- select(data_raw, submission_id, snellen_result, is_expert, age, gender, trial_name, trial_number, fileID, response, RT, timeSpent, comments)
+data_filtered <- filter(data_selection, trial_name != "test_snellen", trial_name != "b0_expert")
+data_mut <- mutate(data_filtered, response = as.double(response), submission_id = factor(submission_id))
+
+show(data_selection)
+show(data_filtered)
+show(data_mut)
+
+# 3 participants only rated "1" in both blocks, one participant only rated "7", one gave a invalid input for the Snellen test, we exclude them:
+data_clean <- filter(data_mut, submission_id != 607, submission_id != 736, submission_id != 475, submission_id != 480, submission_id != 726)
+show(data_clean)
+
+```
+Demografics
+---
+```{r}
+data_rawdemografics <- select(data_clean, submission_id, age, gender, is_expert, snellen_result, comments)
+data_demografics <- dplyr::distinct(group_by(data_rawdemografics, submission_id))
+show(data_demografics[order(data_demografics$submission_id),])
+```
+
+Total number of participents:
+```{r}
+length(unique(data_clean$submission_id))
+```
+Detecting the gender data provided and their count:
+```{r}
+data_gender_male <- filter(data_clean,gender == "male")
+data_gender_female <- filter(data_clean,gender == "female")
+data_gender_diverse <- filter(data_clean,gender == "divers")
+length(data_gender_male$gender)/120
+length(data_gender_female$gender)/120
+length(data_gender_diverse$gender)/120
+sum(is.na(data_clean$gender))/120 # counting how many NA are there.
+```
+There are total 33 male participents, 57 female and 2 of them identify teir gender as diverse and 2 of them did not submitted the data about gender.
+
+Data set according to age :
+```{r}
+data_age_below_20 <- filter(data_clean,age <= 19)
+data_age_20_40<-filter(data_clean,age>=20&age<=40)
+data_age_ab_40 <- filter(data_clean,age > 40)
+#divide by 120 because there are 120 entries per person
+length(data_age_below_20$age)/120 
+length(data_age_20_40$age)/120
+length(data_age_ab_40$age)/120
+sum(is.na(data_clean$age))/120
+```
+From total participants there are total 14 participants, who are below age of 20, 69 are in range of 20 - 40 and 10 are in range of 41 to 63. 1 participants did not give data for age. 
+
+
+Step 3. Filter participants that are experts.
+explit data according to trial (b1: Liking, b2: Detactability).
+---
+This analysis tells us something about the correlation in experts.
+```{r}
+# Data for experts
+data_exp <- filter(data_clean, is_expert == "Yes")
+b1_exp <- filter(data_exp, trial_name == "b1_exp")
+b2_exp <- filter(data_exp, trial_name == "b2_exp")
+
+show(b1_exp)
+show(b2_exp)
+```
+
+Step 4. Average data.
+Generate table with needed non-aggregated data in useful format.
+        
+---
+
+Data of participantsthat passed snellen test
+```{r}
+# Averaged data:
+b1_exp_mean <- group_by(b1_exp, fileID) %>% summarise(mean_Like_exp = mean(response))
+b2_exp_mean <- group_by(b2_exp, fileID) %>% summarise(mean_Detect_exp = mean(response))
+
+show(b1_exp_mean)
+show(b2_exp_mean)
+
+final_exp_mean <- merge(x = b2_exp_mean, y = b1_exp_mean, by = "fileID")
+show(final_exp_mean)
+
+# Non-average data:
+b1_exp_mutated <- mutate(b1_exp, liking_exp = response, RT_liking = RT)
+b2_exp_mutated <- mutate(b2_exp, detectability_exp = response, RT_detectability = RT)
+
+b1_exp_selected <- select(b1_exp_mutated, fileID, submission_id, age, snellen_result, timeSpent, liking_exp, RT_liking)
+b2_exp_selected <- select(b2_exp_mutated, fileID, submission_id, age, snellen_result, timeSpent, detectability_exp, RT_detectability)
+
+b1_exp_orderd <- b1_exp_selected[order(b1_exp_selected$fileID),]
+b2_exp_orderd <- b2_exp_selected[order(b2_exp_selected$fileID),]
+
+merged_exp_data <- b1_exp_orderd
+merged_exp_data$detectability_exp <- b2_exp_orderd$detectability_exp
+merged_exp_data$RT_detectability <- b2_exp_orderd$RT_detectability
+
+show(b1_exp_selected)
+show(b2_exp_selected)
+show(b1_exp_orderd)
+show(b2_exp_orderd)
+show(merged_exp_data)
+
+final_exp <- as_tibble(merged_exp_data)
+show(final_exp)
+
+```
+
+Step 5.Test assumptions for linear regression.
+---
+Normality: 
+```{r}
+# Non-averaged data:
+ks.test(b1_exp$response, pnorm)
+ks.test(b2_exp$response, pnorm)
+
+# Averaged data:
+ks.test(b1_exp_mean$mean_Like_exp, pnorm)
+ks.test(b2_exp_mean$mean_Detect_exp, pnorm)
+```
+Result: According to the Kolmogorov-Smirnov test the variables are not normal distributed. Hence, the normality assumption is not fullfiled. We will test the residual distribution in the next step to make sure that we can still use a linear regression.
+
+Further assumptions: participants without experts
+```{r}
+# Non-averaged data:
+hist(final_exp$liking_exp)
+hist(final_exp$detectability_exp)
+par(mfrow=c(2,2))
+typeof(final_exp)
+
+mod_exp <- lm(final_exp$liking_exp ~ final_exp$detectability_exp, data=final_exp) #linear regression model
+gvlma::gvlma(mod_exp) # further tests for assumtions
+
+summary(mod_exp) # Show summary to check p-value
+plot(resid(mod_exp)) # Plot residuals to check if normality assumption is necessary
+abline(a=0,b=0)
+```
+Result: Most of the assumptions are not satisfied. Linear regression is not possible.
+
+```{r}
+# Averaged data: 
+hist((b1_exp_mean$mean_Like_exp))
+hist((b2_exp_mean$mean_Detect_exp))
+par(mfrow=c(2,2))
+typeof((b1_exp_mean))
+
+mod_mean_exp <- lm((b1_exp_mean$mean_Like_exp) ~ (b2_exp_mean$mean_Detect_exp), data=final_exp_mean) # linear regression model
+gvlma::gvlma(mod_mean_exp) # further tests for assumtions
+
+summary(mod_mean_exp) # Show summary to check p-value
+plot(resid(mod_mean_exp)) # Plot residuals to check if normality assumption is necessary
+abline(a=0,b=0)
+```
+Result: The assumptions for linear regression are satisfied. The distribution of the residuals shows asymmetry along the zero line, but not enough to violate the normality assumption. The p-value shows us that our model is significant. The R-squared value is lower than in the original paper.
+
+Step 6. Make a plot of the averaged data.
+---
+Participants without expecial features:
+```{r}
+cor((b2_exp_mean$mean_Detect_exp), (b1_exp_mean$mean_Like_exp))
+scatter.smooth(y= (b1_exp_mean$mean_Like_exp), x= (b2_exp_mean$mean_Detect_exp), xlab = "Means Detection Scores", ylab = "Means Liking Scores")
+ggplot(final_exp_mean, aes(x = (mean_Detect_exp), y = (mean_Like_exp))) + geom_point() + geom_smooth(method = "lm")
+
+```
+Results: The correlation between the two variables Liking and Detectability is positive, but lower than in the original experiment.
+The lower R-squared value can be explained by outliers.
+
+Step 7. Run bayesian fixed-effects models
+---
+Averaged Data:
+```{r}
+brm_exp_gaussian <- brm(formula=mean_Like_exp ~ mean_Detect_exp, data=final_exp_mean, family = "gaussian")
+summary(brm_exp_gaussian)
+```
+Result: Positive correlation.
+
+Non-Averaged data:
+Cumulative family:
+```{r}
+final_exp_mutated <- mutate(final_exp, liking_exp = as.integer(liking_exp), detectability_exp = as.integer(detectability_exp))
+show(final_exp_mutated)
+
+brm_exp_cumulative <- brm(formula=liking_exp ~ mo(detectability_exp), data=final_exp_mutated, family = "cumulative")
+summary(brm_exp_cumulative)
+```
+Cumulative family for mixed/random effects:
+```{r}
+brm_exp_mixed <- brm(formula=liking_exp ~ mo(detectability_exp) + (1|submission_id), data=final_exp_mutated, family = "cumulative")
+summary(brm_exp_mixed)
+```
+
+```{r}
+brm_exp_mixed2 <- brm(formula=liking_exp ~ mo(detectability_exp) + (1|submission_id) + (1|fileID), data=final_exp_mutated, family = "cumulative")
+summary(brm_exp_mixed2)
+```
+
+Step 8. Compare different bmr models.
+---
+```{r}
+
+loo(brm_exp_cumulative, brm_exp_mixed)
+
+```
+
+```{r}
+
+loo(brm_exp_cumulative, brm_exp_mixed2)
+
+```
+
+```{r}
+
+loo(brm_exp_mixed, brm_exp_mixed2)
+
+```
+
+
+```{r}
+marginal_effects(brm_exp_gaussian)
+marginal_effects(brm_exp_cumulative)
+
+marginal_effects(brm_exp_mixed)
+marginal_effects(brm_exp_mixed2)
+
+```
