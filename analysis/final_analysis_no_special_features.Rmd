@@ -15,7 +15,6 @@ Authors: Group 03
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE, warning = F, message = F)
-
 ```
 
 Load the required packages and set a seed for the random number generator.
@@ -63,49 +62,11 @@ show(data_mut)
 data_clean <- filter(data_mut, submission_id != 607, submission_id != 736, submission_id != 475, submission_id != 480, submission_id != 726)
 show(data_clean)
 ```
-Demografics
----
-```{r}
-data_rawdemografics <- select(data_clean, submission_id, age, gender, is_expert, snellen_result, comments)
-data_demografics <- dplyr::distinct(group_by(data_rawdemografics, submission_id))
-show(data_demografics[order(data_demografics$submission_id),])
-```
-
-Total number of participents:
-```{r}
-length(unique(data_clean$submission_id))
-```
-Detecting the gender data provided and their count:
-```{r}
-data_gender_male <- filter(data_clean,gender == "male")
-data_gender_female <- filter(data_clean,gender == "female")
-data_gender_diverse <- filter(data_clean,gender == "divers")
-length(data_gender_male$gender)/120
-length(data_gender_female$gender)/120
-length(data_gender_diverse$gender)/120
-sum(is.na(data_clean$gender))/120 # counting how many NA are there.
-```
-There are total 33 male participents, 58 female and 2 of them identify teir gender as diverse and 2 of them did not submitted the data about gender.
-
-Data set according to age :
-```{r}
-data_age_below_20 <- filter(data_clean,age <= 19)
-data_age_20_40<-filter(data_clean,age>=20&age<=40)
-data_age_ab_40 <- filter(data_clean,age > 40)
-#divide by 122 beacuse there are 122 entries per person
-length(data_age_below_20$age)/120 
-length(data_age_20_40$age)/120
-length(data_age_ab_40$age)/120
-sum(is.na(data_clean$age))/120
-```
-From total participants there are total 14 participants, who are below age of 20, 70 are in range of 20 - 40 and 10 are in range of 41 to 63. 1 participants did not give data for age.
 
 Step 3. Filter participants with special features as being an expert or having failed the vision test.
 Split data according to trial (b1: Liking, b2: Detactability).
 ---
-
 ```{r}
-# Data without special groups
 data_normal <- filter(data_clean, is_expert == "No", snellen_result > 6)
 b1_normal <- filter(data_normal, trial_name == "b1_exp")
 b2_normal <- filter(data_normal, trial_name == "b2_exp")
@@ -116,10 +77,7 @@ show(b2_normal)
 
 Step 4. Average data.
 Generate table with needed non-aggregated data in useful format.
-        
 ---
-
-Data of participants without special features (snellen failed, expert)
 ```{r}
 # Averaged data:
 b1_normal_mean <- group_by(b1_normal, fileID) %>% summarise(mean_Like_normal = mean(response))
@@ -158,7 +116,7 @@ show(final_normal)
 
 Step 5.Test assumptions for linear regression.
 ---
-Normality: participants without special features
+Normality:
 ```{r}
 # Non-averaged data:
 ks.test(b1_normal$response, pnorm)
@@ -170,7 +128,7 @@ ks.test(b2_normal_mean$mean_Detect_normal, pnorm)
 ```
 Result: According to the Kolmogorov-Smirnov test the variables are not normal distributed. Hence, the normality assumption is not fullfiled. We will test the residual distribution in the next step to make sure that we can still use a linear regression.
 
-Further assumptions: participants without special features
+Further assumptions:
 ```{r}
 # Non-averaged data:
 hist(final_normal$liking_normal)
@@ -205,14 +163,12 @@ Result: Most of the assumptions for linear regression are satisfied. The distrib
 
 Step 6. Make a plot of the averaged data.
 ---
-Participants without special features:
 ```{r}
 cor(b2_normal_mean$mean_Detect_normal, b1_normal_mean$mean_Like_normal)
 scatter.smooth(y=b1_normal_mean$mean_Like_normal, x= b2_normal_mean$mean_Detect_normal, xlab = "Means Detection Scores", ylab = "Means Liking Scores")
 ggplot(final_normal_mean, aes(x = mean_Detect_normal, y = mean_Like_normal)) + geom_point() + geom_smooth(method = "lm")
-
 ```
-Results: The correlation between the two variables Liking and Detectability is positive, but lower than in the original experiment and lower than for all participants.
+Results: The correlation between the two variables Liking and Detectability is positive, but lower than in the original experiment.
 The lower R-squared value can be explained by outliers.
 
 Step 7. Run bayesian fixed-effects models
@@ -222,18 +178,17 @@ Averaged Data:
 brm_normal_gaussian <- brm(formula=mean_Like_normal ~ mean_Detect_normal, data=final_normal_mean, family = "gaussian")
 summary(brm_normal_gaussian)
 ```
-Result: Positiv correltion, since estimate is 0.28.
+Result: Positiv correltion value.
 
 Non-Averaged data:
 Cumulative family:
 ```{r}
 final_normal_mutated <- mutate(final_normal, liking_normal = as.integer(liking_normal), detectability_normal = as.integer(detectability_normal))
-show(final_normal_mutated)
 
 brm_normal_cumulative <- brm(formula=liking_normal ~ mo(detectability_normal), data=final_normal_mutated, family = "cumulative")
 summary(brm_normal_cumulative)
 ```
-Result: positive correlation, estimate is 0.34.
+Result: positive correlation value.
 
 Cumulative family for mixed/random effects:
 ```{r}

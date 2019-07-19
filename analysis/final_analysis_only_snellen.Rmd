@@ -1,5 +1,5 @@
 ---
-title: "Data Analysis for Give me Gestalt - Cubist Art sferiment"
+title: "Data Analysis for Give me Gestalt - Cubist Art Experiment"
 output: pdf_document
 Authors: Group 03
 ---
@@ -15,7 +15,6 @@ Authors: Group 03
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE, warning = F, message = F)
-
 ```
 
 Load the required packages and set a seed for the random number generator.
@@ -39,17 +38,14 @@ set.seed(123)
 
 Step 1. Read the data and take a glimpse of it.
 ---
-
 ```{r}
 data_raw <- read_csv("results_71_givemegestalt_group3_group3.csv")
 glimpse(data_raw)
 ```
 
-
 Step 2. Select only the columns of interest and filter trials that are not interesting for the calculations.
-Change data type of the responses to double and submission_id to factor. Detect outliers.
+Change data type of the responses to double and submission_id to factor. Delet invalid participants.
 ---
-
 ```{r}
 data_selection <- select(data_raw, submission_id, snellen_result, is_expert, age, gender, trial_name, trial_number, fileID, response, RT, timeSpent, comments)
 data_filtered <- filter(data_selection, trial_name != "test_snellen", trial_name != "b0_expert")
@@ -62,50 +58,11 @@ show(data_mut)
 # 3 participants only rated "1" in both blocks, one participant only rated "7", one gave a invalid input for the Snellen test, we exclude them:
 data_clean <- filter(data_mut, submission_id != 607, submission_id != 736, submission_id != 475, submission_id != 480, submission_id != 726)
 show(data_clean)
-
 ```
-Demografics
+
+Step 3. Choose only participants who failed the vision test.
+Split data according to trial (b1: Liking, b2: Detactability).
 ---
-```{r}
-data_rawdemografics <- select(data_clean, submission_id, age, gender, is_expert, snellen_result, comments)
-data_demografics <- dplyr::distinct(group_by(data_rawdemografics, submission_id))
-show(data_demografics[order(data_demografics$submission_id),])
-```
-
-Total number of participents:
-```{r}
-length(unique(data_clean$submission_id))
-```
-Detecting the gender data provided and their count:
-```{r}
-data_gender_male <- filter(data_clean,gender == "male")
-data_gender_female <- filter(data_clean,gender == "female")
-data_gender_diverse <- filter(data_clean,gender == "divers")
-length(data_gender_male$gender)/120
-length(data_gender_female$gender)/120
-length(data_gender_diverse$gender)/120
-sum(is.na(data_clean$gender))/120 # counting how many NA are there.
-```
-There are total 33 male participents, 58 female and 2 of them identify teir gender as diverse and 2 of them did not submitted the data about gender.
-
-Data set according to age :
-```{r}
-data_age_below_20 <- filter(data_clean,age <= 19)
-data_age_20_40<-filter(data_clean,age>=20&age<=40)
-data_age_ab_40 <- filter(data_clean,age > 40)
-#divide by 122 beacuse there are 122 entries per person
-length(data_age_below_20$age)/120 
-length(data_age_20_40$age)/120
-length(data_age_ab_40$age)/120
-sum(is.na(data_clean$age))/120
-```
-From total participants there are total 14 participants, who are below age of 20, 70 are in range of 20 - 40 and 10 are in range of 41 to 63. 1 participants did not give data for age. 
-
-
-Step 3. Filter participants who failed the vision test.
-sflit data according to trial (b1: Liking, b2: Detactability).
----
-This analysis tells us something about the correlation in experts.
 ```{r}
 # Data for experts
 data_sf <- filter(data_clean, snellen_result < 7)
@@ -118,10 +75,7 @@ show(b2_sf)
 
 Step 4. Average data.
 Generate table with needed non-aggregated data in useful format.
-        
 ---
-
-Data of participantsthat failed snellen test
 ```{r}
 # Averaged data:
 b1_sf_mean <- group_by(b1_sf, fileID) %>% summarise(mean_Like_sf = mean(response))
@@ -155,7 +109,6 @@ show(merged_sf_data)
 
 final_sf <- as_tibble(merged_sf_data)
 show(final_sf)
-
 ```
 
 Step 5.Test assumptions for linear regression.
@@ -187,11 +140,10 @@ summary(mod_sf) # Show summary to check p-value
 plot(resid(mod_sf)) # Plot residuals to check if normality assumption is necessary
 abline(a=0,b=0)
 ```
-Result: Some of the assumptions are not satisfied. Linear regression is not possible.
+Result: Some of the assumptions are not satisfied. Linear regression is not optimal
 
 ```{r}
-# Averaged data: liking and detectability is log transformed here since the detectability ditribution was skewed.
-
+# Averaged data:
 hist((b1_sf_mean$mean_Like_sf))
 hist((b2_sf_mean$mean_Detect_sf))
 par(mfrow=c(2,2))
@@ -208,15 +160,13 @@ Result: The assumptions for linear regression are satisfied. The distribution of
 
 Step 6. Make a plot of the averaged data.
 ---
-Participants without sfecial features:
 ```{r}
 cor((b2_sf_mean$mean_Detect_sf), (b1_sf_mean$mean_Like_sf))
 scatter.smooth(y= (b1_sf_mean$mean_Like_sf), x= (b2_sf_mean$mean_Detect_sf), xlab = "Means Detection Scores", ylab = "Means Liking Scores")
 ggplot(final_sf_mean, aes(x = (mean_Detect_sf), y = (mean_Like_sf))) + geom_point() + geom_smooth(method = "lm")
-
 ```
-Results: The correlation between the two variables Liking and Detectability is positive, but lower than in the original sferiment.
-The lower R-squared value can be sflained by outliers.
+Results: The correlation between the two variables Liking and Detectability is positive, but lower than in the original experiment.
+The lower R-squared value can be explained by outliers.
 
 Step 7. Run bayesian fixed-effects models
 ---
@@ -231,7 +181,6 @@ Non-Averaged data:
 Cumulative family:
 ```{r}
 final_sf_mutated <- mutate(final_sf, liking_sf = as.integer(liking_sf), detectability_sf = as.integer(detectability_sf))
-show(final_sf_mutated)
 
 brm_sf_cumulative <- brm(formula=liking_sf ~ mo(detectability_sf), data=final_sf_mutated, family = "cumulative")
 summary(brm_sf_cumulative)
