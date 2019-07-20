@@ -1,5 +1,5 @@
 ---
-title: "Data Analysis for Give me Gestalt - Cubist Art Experiment"
+title: "Data Analysis - Experts"
 output: pdf_document
 Authors: Group 03
 ---
